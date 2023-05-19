@@ -5,9 +5,7 @@ use time::Date;
 
 pub fn ddate(fmt: &str, date: Date) -> Option<String> {
     let st_tib = "St. Tib's Day";
-    let mut output = String::new();
-    let mut subgenius = String::new();
-    let mut str = &mut output;
+    let mut str = String::new();
     let mut iter = fmt.chars();
     while let Some(c) = iter.next() {
         match c {
@@ -25,7 +23,7 @@ pub fn ddate(fmt: &str, date: Date) -> Option<String> {
                 Some('e') => str.push_str(&format!("{}", O8::from1(date.discordian_day()?))),
 
                 Some('H') => str.push_str(if date.is_sttibs_day() {
-                    "St. Tibb's Day"
+                    st_tib
                 } else {
                     date.discordian_holyday()?.full_name()
                 }),
@@ -46,11 +44,14 @@ pub fn ddate(fmt: &str, date: Date) -> Option<String> {
 
                 Some('{') => {
                     if date.is_sttibs_day() {
-                        str.push_str("St. Tib's Day");
-                        str = &mut subgenius;
+                        str.push_str(st_tib);
+                        while {
+                            iter.find(|&c| c == '%');
+                            iter.next()? != '}'
+                        } {}
                     }
                 }
-                Some('}') => str = &mut output,
+                Some('}') => {}
 
                 None => str.push('%'),
 
@@ -63,7 +64,7 @@ pub fn ddate(fmt: &str, date: Date) -> Option<String> {
         }
     }
 
-    Some(output)
+    Some(str)
 }
 
 const WORDS_OF_WISDOM: &[&str] = &[
