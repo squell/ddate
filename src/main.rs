@@ -34,15 +34,22 @@ pub fn now() -> Date {
 }
 
 fn assistance() {
-    println!("ddate [+format] [day month year]");
+    eprintln!("ddate [+format] [day month year]");
 }
 
-fn parse_date(day: Option<String>, month: Option<String>, year: Option<String>) -> Option<Date> {
+fn parse_date(
+    day: Option<String>,
+    month: Option<String>,
+    year: Option<String>,
+) -> Option<(i32, Month, u8)> {
     let aneristic_day = str::parse::<u8>(&day?).ok()?;
-    let aneristic_month = month.and_then(|text| {
+    let aneristic_month = month.and_then(|mut text| {
         if let Ok(number) = str::parse::<u8>(&text) {
             Month::try_from(number).ok()
         } else {
+            let (head, tail) = text.split_at_mut(1);
+            head.make_ascii_uppercase();
+            tail.make_ascii_lowercase();
             Month::from_str(&text).ok()
         }
     })?;
@@ -54,7 +61,7 @@ fn parse_date(day: Option<String>, month: Option<String>, year: Option<String>) 
             _ => None,
         })?;
 
-    Date::from_calendar_date(aneristic_year, aneristic_month, aneristic_day).ok()
+    Some((aneristic_year, aneristic_month, aneristic_day))
 }
 
 fn main() {
@@ -71,12 +78,17 @@ fn main() {
     }
 
     let the_date = if arg1.is_some() {
-        let Some(parsed_date) = parse_date(arg1, user_wishes.next(), user_wishes.next()) else {
+        let Some((y,m,d)) = parse_date(arg1, user_wishes.next(), user_wishes.next()) else {
             return assistance()
         };
         if user_wishes.next().is_some() {
             return assistance();
         }
+
+        let Ok(parsed_date) = Date::from_calendar_date(y,m,d) else {
+            eprintln!("I remember that day like it was yesterday.");
+            return
+        };
 
         parsed_date
     } else {
