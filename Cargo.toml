@@ -1,0 +1,9 @@
+[package]
+name = "ddate"
+version = "5.5.5"
+edition = "2021"
+
+[dependencies]
+time = { version = "0.3", features = ["macros"] }
+num-ordinal = "0.2"
+getrandom = "0.2"
