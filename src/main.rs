@@ -17,20 +17,16 @@
 
 use std::cmp::Ordering;
 use std::env;
-use std::ops::Add;
 use std::str::FromStr;
-use std::time::{SystemTime, UNIX_EPOCH};
-use time::{macros::date, Date, Month};
+use time::{Date, Month, OffsetDateTime};
 
 mod discord;
 mod formatter;
 
 pub fn now() -> Date {
-    let days_since_beard = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .expect("your UNIX timestamps are interesting.");
-
-    date!(1970 - 01 - 01).add(days_since_beard)
+    OffsetDateTime::now_local()
+        .expect("Tomorrow is yesterday.")
+        .date()
 }
 
 fn assistance() {
